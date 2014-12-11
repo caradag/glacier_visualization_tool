@@ -113,7 +113,7 @@ switch field
         for p=1:length(panels)
             for d=1:length(panels(p).data)
                 currentNormMode=panels(p).data(d).normMode;
-                if (p~=idx(1) || d~=idx(2)) && ~isequal(currentNormMode,normMode)
+                if (p~=idx(1) || d~=idx(2)) && (~isequal(currentNormMode,normMode) || any(strcmp(normMode,{'manual','window'})))
                     panels(p).data(d).normMode=normMode;
                     panels(p).data(d).yData=[];
                 end

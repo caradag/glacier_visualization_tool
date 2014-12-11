@@ -45,18 +45,20 @@ function displayMap(source, eventdata, option)
     for p=1:length(panels)
         for d=1:length(panels(p).data)
             type=panels(p).data(d).type;
-            switch type
-                case 'gps'
-                    ID=panels(p).data(d).ID;
-                case 'sensors'
-                    type='boreholes';
-                    ID=['H' data.(panels(p).data(d).ID).metadata.hole{1}{1}];
+            if any(strcmp(type,{'gps','sensors'}))
+                switch type
+                    case 'gps'
+                        ID=panels(p).data(d).ID;
+                    case 'sensors'
+                        type='boreholes';
+                        ID=['H' data.(panels(p).data(d).ID).metadata.hole{1}{1}];
+                end
+                instruments.(type).(ID).status=true;
+                instruments.(type).(ID).panel=p;
+                instruments.(type).(ID).idx=d;
+                instruments.(type).(ID).selected=panels(p).data(d).selected | instruments.(type).(ID).selected;
+                instruments.(type).(ID).preSelect=false;
             end
-            instruments.(type).(ID).status=true;
-            instruments.(type).(ID).panel=p;
-            instruments.(type).(ID).idx=d;
-            instruments.(type).(ID).selected=panels(p).data(d).selected | instruments.(type).(ID).selected;
-            instruments.(type).(ID).preSelect=false;
         end
     end    
     

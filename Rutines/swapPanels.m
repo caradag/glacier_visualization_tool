@@ -8,6 +8,9 @@ global panels
 % if idx1 and idx2 are 1x2 arrays, the second element is considered the data
 % field to swap with
 
+if nargin<5
+    doRedraw=true;
+end
 % if idx1 and idx2 are equal we do nothing
 if numel(idx1)==numel(idx2) && all(idx1(:)==idx2(:))
     return;

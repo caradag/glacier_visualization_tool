@@ -45,7 +45,7 @@ tic
 %computing overall time range
 tLims=nan(npanels,2);
 for i=1:npanels
-    tLims(npanels,1:2)=panels(i).axisLimsClean.time_days;%produces an with all the time limits [min max] of each panel in a row
+    tLims(i,1:2)=panels(i).axisLimsClean.time_days; %produces an with all the time limits [min max] of each panel in a row
 end
 % Setting the time limits to include all panels and +- 6 hours to see properly
 % data at the start and the end
@@ -187,7 +187,7 @@ for i=1:npanels
         breakes=panels(i).data(d).breakes;
         nSegments=size(breakes,1);
         panels(i).data(d).lineHandle=[];
-
+        brokenIdex=[];
         if nSegments>100 || ~panels(i).data(d).selected
             % If there is too many segments we plot them all at once, but first
             % insert NaN in between them so they won't be connected by any line when plotting
@@ -338,10 +338,12 @@ for i=1:npanels
             % PLoting file starts
             fileStartsTimes=data.(ID).time.serialtime(data.(ID).metadata.files.limits{1}(:,1));
             nfiles=length(fileStartsTimes);
+
             for fc=1:nfiles
                 [~, startPoint]=min(abs(time-fileStartsTimes(fc)));
+                [~, rawStartPoint]=min(abs(data.(ID).time.serialtime-time(startPoint)));
                 markersmenu(end+1) = uicontextmenu;
-                plot(fileStartsTimes(fc),panels(i).data(d).y2norm((data.(ID).pressure{1}(startPoint)+panels(i).data(d).offset(startPoint))/1000)+i-1,'r>','UIContextMenu', markersmenu(end));
+                plot(fileStartsTimes(fc),panels(i).data(d).y2norm((data.(ID).pressure{1}(rawStartPoint)+panels(i).data(d).offset(rawStartPoint))/1000)+i-1,'r>','UIContextMenu', markersmenu(end));
                 uimenu(markersmenu(end), 'Label',['File: ' data.(ID).metadata.files.names{1}{fc}]);
                 uimenu(markersmenu(end), 'Label',['Start on : ' datestr(fileStartsTimes(fc))]);
                 uimenu(markersmenu(end), 'Label','Open', 'Callback',['edit ' const.rawDataFolder data.(ID).metadata.files.names{1}{fc}]);

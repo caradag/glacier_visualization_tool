@@ -20,7 +20,9 @@ function figureKeyPress(source,eventdata,panel,d,overrideCurrentKey)
 %##########################################################################
         case {fHandles.browsefig,0}
             switch currentKey
-                case {'R','r'} % Remove all panels
+                case 'r' % Remove all panels
+                    ruler;
+                case 'R' % Remove all panels
                     panels=[];
                     updatePlot();
                 case 'n'
@@ -39,6 +41,9 @@ function figureKeyPress(source,eventdata,panel,d,overrideCurrentKey)
                 case 'M' % zoom to a month around center of current view
                     updatePos('figureKeyPress',[],[-16 16]+mean(displayStatus.tLims));
                     updatePlot();
+                case 'T' % zoom to a 3 month around center of current view
+                    updatePos('figureKeyPress',[],[-45 45]+mean(displayStatus.tLims));
+                    updatePlot();
                 case 'W' % zoom out to full range
                     updatePos('figureKeyPress',[],[-4 4]+mean(displayStatus.tLims));
                     updatePlot();
@@ -49,6 +54,8 @@ function figureKeyPress(source,eventdata,panel,d,overrideCurrentKey)
                     updatePos('figureKeyPress',[],displayStatus.timeSel(:,1));
                 case 'a' % Open add data dialog box
                     addData();
+                case 'l'
+                    loadFrame;
                 case 'k' % Toggle between line plot or marker plot for selected line
                     [panel idx] = selectedSensor();
                     if strcmp(panels(panel).data(idx).style,'-   none')

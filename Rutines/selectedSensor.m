@@ -3,6 +3,9 @@ function [p d] = selectedSensor(source,eventdata,panelIdx)
     [p d] = getSelection();
     % if panelIdx is not given we just return the current selection 
     if nargin<3
+        if nargout==1
+            p=[p d];
+        end
         return;
     end    
     

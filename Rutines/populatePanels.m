@@ -73,12 +73,6 @@ function populatePanels(forceRePopulation)
             if isfield(panels(p).data(d),'yData') && ~isempty(panels(p).data(d).yData) && ~forceRePopulation
                 continue;
             end
-            % loading data if needed
-            if ~isfield(data,ID)
-                tmp=load([const.DataFolder const.sensorDataFile],ID);
-                data.(ID)=tmp.(ID);
-                clear tmp
-            end
             
             ID=panels(p).data(d).ID;
             var=panels(p).data(d).variable;
@@ -106,6 +100,12 @@ function populatePanels(forceRePopulation)
             
             switch panels(p).data(d).type
                 case 'sensors'
+                    % loading data if needed
+                    if ~isfield(data,ID)
+                        tmp=load([const.DataFolder const.sensorDataFile],ID);
+                        data.(ID)=tmp.(ID);
+                        clear tmp
+                    end
                     switch var
                         case 'pressure'
                             %getting data
@@ -329,13 +329,14 @@ function populatePanels(forceRePopulation)
                 case 'meteo'
                     switch var
                         case 'temperature'
-                            if nDataFields>1 %if meteo data is together with other data in the panel, it is subseted to the time frame of the other data
+                            if nDataFields>1 && all(~isnan(panels(p).axisLims.time_days))%if meteo data is together with other data in the panel, it is subseted to the time frame of the other data
                                 [yData time] = timeSubset(panels(p).axisLims.time_days,ambientTemp.time,ambientTemp.temp);
                             else
                                 yData=ambientTemp.temp;
                                 time=ambientTemp.time;
                             end
                             [norm2y y2norm yData]=normalize(yData, time,panels(p).data(d).normMode);
+                            
                             lines(end+1).value=y2norm(0);
                             lines(end).description='0°C freezing line';                        
                             lines(end).color=[1 0.75 0.27];
@@ -353,7 +354,7 @@ function populatePanels(forceRePopulation)
                                 north=6744200;%approx. northing of centra GPS tower
                             end
                             [~, northIdx]=min(abs(sMelt.northing-north));
-                            if nDataFields>1 %if meteo data is together with other data in the panel, it is subseted to the time frame of the other data
+                            if nDataFields>1 && all(~isnan(panels(p).axisLims.time_days)) %if meteo data is together with other data in the panel, it is subseted to the time frame of the other data
                                 [yData time] = timeSubset(panels(p).axisLims.time_days,sMelt.time,sMelt.melt(:,northIdx)*24);
                             else
                                 yData=sMelt.melt(:,northIdx)*24;
@@ -451,29 +452,35 @@ function [n2y y2n nyAll nxAll ny nx]=normalize(y, x, normMode, deletedMask, thic
     end
     switch normMode{1}
         case 'range'
-            miny=min(y(~deletedMask))*0.99;
-            maxy=max(y(~deletedMask))*1.01;
+            miny=min(y(~deletedMask));
+            maxy=max(y(~deletedMask));
         case 'rawRange'
-            miny=min(y)*0.99;
-            maxy=max(y)*1.01;
+            miny=min(y);
+            maxy=max(y);
         case {'manual','cursor'}
             miny=min(normMode{2});
             maxy=max(normMode{2});
         case 'window'
-            miny=min(subsetY)*0.99;
-            maxy=max(subsetY)*1.01;
+            miny=min(subsetY);
+            maxy=max(subsetY);
         case 'waterColumn'
             miny=0;
-            maxy=thickness*const.g*1.01;
+            maxy=thickness*const.g;
         case 'Zero2Max'
             miny=0;
-            maxy=max(y(~deletedMask)*1.01);
+            maxy=max(y(~deletedMask));
         case 'waterColumnOrMax'
             miny=0;
-            maxy=max(thickness*const.g,max(y(~deletedMask)))*1.01;
+            maxy=max(thickness*const.g,max(y(~deletedMask)));
     end
-    n2y=@(v)v*(maxy-miny)+miny;
-    y2n=@(v)(v-miny)/(maxy-miny);
+    
+    margin=(maxy-miny)*0.01;
+    miny=miny-margin;
+    maxy=maxy+margin;
+    range=maxy-miny;
+    
+    n2y=@(v)v*range+miny;
+    y2n=@(v)(v-miny)/range;
     
     ny=y2n(y(~deletedMask));
     nx=x(~deletedMask);

@@ -11,8 +11,10 @@ function saveRestoreCurrentView(source,eventdata,action)
             [dataFile dataPath]=uigetfile('*.gph','Load graph visualization');            
             if dataFile
                 load([dataPath dataFile],'-mat');
+                savedTimeLims=displayStatus.tLims;
                 panels=lightPanels;
                 updatePlot();
+                updatePos('figureKeyPress',[],savedTimeLims)
             end
     end    
 end
