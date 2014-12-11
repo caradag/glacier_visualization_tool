@@ -10,6 +10,7 @@ function populatePanels(forceRePopulation)
     end
     npanels=length(panels);
     toRemove=[];
+    
     %######## COMPILING DATA STATISTICS: POSITIONS AND TIME SPANS #########
     for p=1:npanels
         axisLims=struct('time_days',[NaN NaN],'press_kPa',[],'press_mWaterEq',[],'press_PSI',[],'volt_V',[],'temp_C',[],'speed_cmPerDay',[],'deviation_mm',[],'melt_mmPerDay',[]);
