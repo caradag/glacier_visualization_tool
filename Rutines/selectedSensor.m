@@ -37,13 +37,21 @@ function [p d] = selectedSensor(source,eventdata,panelIdx)
     if nargin==3 && numel(panelIdx)>=2
         p=panelIdx(1);
         d=panelIdx(2);
-        s=1;
+        s=0;
         if numel(panelIdx)>2
             s=panelIdx(3);
         end
         panels(p).data(d).selected=true;
         if isfield(panels(p).data(d),'lineHandle')
-            set(panels(p).data(d).lineHandle(s),'LineWidth',2);
+            if s
+                set(panels(p).data(d).lineHandle(s),'LineWidth',2);
+            else
+                for i=1:length(panels(p).data(d).lineHandle)
+                    if ishandle(panels(p).data(d).lineHandle(i))
+                        set(panels(p).data(d).lineHandle(i),'LineWidth',2);
+                    end
+                end
+            end
         end
         yAxis(p,d);
     end
