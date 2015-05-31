@@ -29,7 +29,7 @@ function getFullInfo(source,eventdata,panel,d)
             for ins=1:nInstallations
                 insDoyVec=data.(ID).metadata.installationTime{1}(ins,:);
                 instTime=datenum([insDoyVec(1) 1 1 fix(insDoyVec(3)/100) mod(insDoyVec(3),100) 0])+insDoyVec(2)-1;
-                uninstDoyVec=data.(ID).metadata.uninstallationTime{1}(ins,:);
+                uninstDoyVec=data.(ID).metadata.uninstallationTime{1}(ins,:)
                 uninstTime=datenum([uninstDoyVec(1) 1 1 fix(uninstDoyVec(3)/100) mod(uninstDoyVec(3),100) 0])+uninstDoyVec(2)-1;
                 Msg{end+1}=sprintf('Installation on: %s (DOY %d) to %s (DOY %d)',datestr(instTime),insDoyVec(2),datestr(uninstTime),uninstDoyVec(2));
             end

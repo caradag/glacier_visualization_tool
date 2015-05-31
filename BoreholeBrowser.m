@@ -25,8 +25,8 @@ function BoreholeBrowser()
     const.sensorPressureTolerance=400/const.psiPerPascal;
 
     %defining available axis units
-    const.axisIDs=  {'press_kPa', 'press_mWaterEq' , 'press_PSI' , 'volt_V', 'temp_C', 'speed_cmPerDay', 'deviation_mm', 'melt_mmPerDay','ID'};
-    const.axisUnits={'kPa'      , 'm (w.depth eq.)', 'PSI', 'Volts'     , '°C'    , 'cm/day'        , 'mm'          , 'mm.w.eq/day','ID'};
+    const.axisIDs=  {'press_kPa', 'press_mWaterEq' , 'press_PSI' , 'volt_V', 'temp_C', 'speed_cmPerDay', 'deviation_mm', 'melt_mmPerDay','ID','norm'};
+    const.axisUnits={'kPa'      , 'm (w.depth eq.)', 'PSI', 'Volts'     , '°C'    , 'cm/day'        , 'mm'          , 'mm.w.eq/day','ID','Normalized'};
     for i=1:length(const.axisIDs)
         const.availableAxes.(const.axisIDs{i}).ticks=[];
         const.availableAxes.(const.axisIDs{i}).labels=[];
@@ -48,13 +48,22 @@ function BoreholeBrowser()
     loadData();
 
     % ############# creating main browser interface ###################
+    disp('Creating main data browser figure');
     fHandles.browsefig=figure('Name','Field Data Browser','NumberTitle','off','Position',[2 60 W H],'ResizeFcn',@drawFigure,'KeyPressFcn',@figureKeyPress,'MenuBar','none');
+    drawFigure();
+    %set(fHandles.browsefig,'Name','Field Data Browser','NumberTitle','off','Position',[2 60 W H],'ResizeFcn',@drawFigure,'KeyPressFcn',@figureKeyPress,'MenuBar','none');
 end
 %##########################################################################
 %################# DRAW FIGURE SUB FUNCTION ###############################
 %##########################################################################
 function drawFigure(source,eventdata)
     global fHandles const displayStatus
+    if ~isfield(fHandles,'browsefig')
+        %Newer version of matlab call the ResizeFn while the figure is
+        %being created. With this we avoid trying to draw the figure before
+        %the handle to it is assigned to fHandles.browsefig
+        return;
+    end
     [~, ~, w, H]=dealOneByOne(get(fHandles.browsefig,'Position'));
     clf(fHandles.browsefig);
     buttonW=80;
@@ -133,9 +142,19 @@ function drawFigure(source,eventdata)
     uimenu(graphMenu,'Label','Save current graph...','Callback',{@saveRestoreCurrentView,'save'});
     uimenu(graphMenu,'Label','Load saved graph...','Callback',{@saveRestoreCurrentView,'load'});
 
-%     analisysMenu = uimenu('Label','Analisys');
-%     uimenu(analisysMenu,'Label','Run daily forcing content analisys','Callback','dailyForcingContent');
-%     uimenu(analisysMenu,'Label','Run cross correlation analisys','Callback','');
+    analisysMenu = uimenu('Label','Analisys');
+    diurnalOscillationsMenu=uimenu(analisysMenu,'Label','Run diurnal oscilations power analisis');
+    uimenu(diurnalOscillationsMenu,'Label','Run on current screen data','Callback',{@diurnalOscilationPower,[],'window'});
+    uimenu(diurnalOscillationsMenu,'Label','Run on loadad data','Callback',{@diurnalOscilationPower,[],'all'});
+    correlationMenu=uimenu(analisysMenu,'Label','Run cross correlation analisys');
+    uimenu(correlationMenu,'Label','Run on current screen data','Callback','dailyForcingContent');
+    uimenu(correlationMenu,'Label','Run on loadad data','Callback','dailyForcingContent');
+    stepwiseRegressionMenu=uimenu(analisysMenu,'Label','Run stepwise regresion analisys');
+    uimenu(stepwiseRegressionMenu,'Label','Run on current screen data','Callback','dailyForcingContent');
+    uimenu(stepwiseRegressionMenu,'Label','Run on loadad data','Callback','dailyForcingContent');
+    spectrumMenu=uimenu(analisysMenu,'Label','Show frequency spectrum');
+    uimenu(spectrumMenu,'Label','Of selected time setries over current window','Callback',{@getSpectrum});
+    
 
     %########################## PLOTING DATA ##################################
     updatePlot();

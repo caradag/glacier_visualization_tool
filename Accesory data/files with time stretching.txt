@@ -1,0 +1,37 @@
+10P01,17-Jul-2012 15:08:00 to 18-Jul-2012 15:59:00,1 minutes, /2012/summer/loggers/raw/2381.004
+10P04,17-Jul-2012 15:08:00 to 18-Jul-2012 15:59:00,1 minutes, /2012/summer/loggers/raw/2381.004
+10P07,17-Jul-2012 15:08:00 to 18-Jul-2012 15:59:00,1 minutes, /2012/summer/loggers/raw/2381.004
+10P08,17-Jul-2012 15:08:00 to 18-Jul-2012 15:59:00,1 minutes, /2012/summer/loggers/raw/2381.004
+11P20,17-Jul-2012 15:08:00 to 18-Jul-2012 15:59:00,1 minutes, /2012/summer/loggers/raw/2381.004
+12P30,17-Jul-2012 15:08:00 to 18-Jul-2012 15:59:00,1 minutes, /2012/summer/loggers/raw/2381.004
+
+10P11,24-Jul-2014 21:10:00 to 31-Jul-2014 22:16:00,2 minutes, /2014/summer/loggers/raw/15949.002
+11P11,24-Jul-2014 21:10:00 to 31-Jul-2014 22:16:00,2 minutes, /2014/summer/loggers/raw/15949.002
+12P21,24-Jul-2014 21:10:00 to 31-Jul-2014 22:16:00,2 minutes, /2014/summer/loggers/raw/15949.002
+12P43,24-Jul-2014 21:10:00 to 31-Jul-2014 22:16:00,2 minutes, /2014/summer/loggers/raw/15949.002
+13P44,24-Jul-2014 21:10:00 to 31-Jul-2014 22:16:00,2 minutes, /2014/summer/loggers/raw/15949.002
+13P47,24-Jul-2014 21:10:00 to 31-Jul-2014 22:16:00,2 minutes, /2014/summer/loggers/raw/15949.002
+13P48,24-Jul-2014 21:10:00 to 31-Jul-2014 22:16:00,2 minutes, /2014/summer/loggers/raw/15949.002
+13P57,24-Jul-2014 21:10:00 to 31-Jul-2014 22:16:00,2 minutes, /2014/summer/loggers/raw/15949.002
+
+10P18,05-Jul-2011 16:58:00 to 20-Jul-2011 17:33:00,1 minutes, /2011/summer/loggers/raw/12603.002
+10P20,05-Jul-2011 16:58:00 to 20-Jul-2011 17:33:00,1 minutes, /2011/summer/loggers/raw/12603.002
+
+10P18,20-Jul-2011 17:42:00 to 23-Jul-2011 19:41:00,1 minutes, /2011/summer/loggers/raw/12603.004
+11P09,20-Jul-2011 17:42:00 to 23-Jul-2011 19:41:00,1 minutes, /2011/summer/loggers/raw/12603.004
+10P20,20-Jul-2011 17:42:00 to 23-Jul-2011 19:41:00,1 minutes, /2011/summer/loggers/raw/12603.004
+
+10P19,11-Jul-2011 20:06:00 to 11-Jul-2011 20:55:00,1 minutes, /2011/summer/loggers/raw/6566.003
+11P02,11-Jul-2011 20:06:00 to 11-Jul-2011 20:55:00,1 minutes, /2011/summer/loggers/raw/6566.003
+11P33,11-Jul-2011 20:06:00 to 11-Jul-2011 20:55:00,1 minutes, /2011/summer/loggers/raw/6566.003
+
+10P19,20-Jul-2012 12:18:00 to 20-Jul-2012 14:07:00,1 minutes, /2012/summer/loggers/raw/6566.005
+11P02,20-Jul-2012 12:18:00 to 20-Jul-2012 14:07:00,1 minutes, /2012/summer/loggers/raw/6566.005
+11P03,20-Jul-2012 12:18:00 to 20-Jul-2012 14:07:00,1 minutes, /2012/summer/loggers/raw/6566.005
+
+10P23,19-Jul-2010 14:40:00 to 21-Jul-2010 18:19:00,1 minutes, /2010/summer/loggers/raw/6563.007
+10P10,19-Jul-2010 14:40:00 to 21-Jul-2010 18:19:00,1 minutes, /2010/summer/loggers/raw/6563.007
+
+12P44,03-Sep-2012 18:20:00 to 22-May-2013 15:59:00,1 minutes, /2013/winter/loggers/raw/14534.017
+12P46,03-Sep-2012 18:20:00 to 22-May-2013 15:59:00,1 minutes, /2013/winter/loggers/raw/14534.017
+

@@ -1,0 +1,147 @@
+% Set ignore flag to 1 if the file should not be used at all
+% Set offset times adding sign to all entries (i.e. -1 day -3 hour -2 minutes)
+% If there is entries to be ignored, set the first and last valid entries to something different than 1:end
+% Remember not to use commas on comments
+%
+% File path and name,Ignore flag,Initial offset days,Initial offset Hours,Initial offset minutes,Final offset days,Final offset Hours,Final offset minutes,First valid entry,Last valid entry
+/2008/summer/loggers/raw/2379.001,0,-1,0,0,0,0,0,1,end
+/2008/summer/loggers/raw/2379.002,0,-1,0,0,0,0,0,1,end
+/2008/summer/loggers/raw/2379.003,0,-1,0,0,0,0,0,1,end
+% Info from par file
+%
+/2010/winter/loggers/raw/14534.001,1,0,0,6,0,0,0,1,end
+/2010/winter/loggers/raw/14534.002,1,0,0,6,0,0,0,1,end
+% Par file contined a +6 minutes offset, but file has only two lines (for the same time) and a 1 day jump with next file. So it will be discarded
+%
+/2010/winter/loggers/raw/6563.001,0,0,0,1,0,0,0,1,end
+% Info from par file
+%
+/2010/winter/loggers/raw/6566.001,0,0,0,1,0,0,0,1,end
+% Info from par file
+%
+/2009/summer/loggers/raw/2379.005,1,0,0,0,0,0,0,1,end
+% Only two entries in file and with overlapping timestamps
+%
+/2009/summer/loggers/raw/6566.004,1,0,0,0,0,0,0,1,end
+% Only one entry in file and with overlapping timestamps
+%
+%/2008/summer/loggers/raw/6566.001,0,-1,0,0,0,0,0,1,end
+%/2008/summer/loggers/raw/6566.002,0,-1,0,0,0,0,0,1,end
+%/2008/summer/loggers/raw/6566.003,0,-1,0,0,0,0,0,1,end
+%/2008/summer/loggers/raw/6566.004,0,-1,0,0,0,0,0,1,end
+%/2008/summer/loggers/raw/6566.005,0,-1,0,0,0,0,0,1,end
+%/2009/winter/loggers/raw/6566.001,0,-1,0,0,0,0,0,1,end
+%/2009/winter/loggers/raw/6566.002,0,-1,0,0,0,0,0,1,end
+%% Offset set on 2008 and nor corrected until conrad realized it in summer 2009
+% Above offsets were deleted, as from temperature records the clock seem to have being correctly adjusted
+% the same records show that once logger was restarted next summer in /2009/summer/loggers/raw/6566.003 the logger clock was OK too
+%
+/2010/summer/loggers/raw/3464.001,0,3858,20,0,0,0,0,1,end
+/2010/summer/loggers/raw/3464.002,0,3858,20,0,0,0,0,1,2
+% Offset computed from time jump between lines 2 and 3 of /2010/summer/loggers/raw/3464.002
+%
+/2011/winter/loggers/raw/19857.001,1,0,0,0,0,0,0,1,end
+% Only one entry in file and with overlapping timestamps
+%
+/2015/winter/loggers/raw/2381.001,1,0,0,0,0,0,0,1,end
+% Only one entry, the next file (002) have data for the same timestamp with VERY similar values
+%
+/2010/winter/loggers/raw/12709.001,1,0,0,5,0,0,0,1,end
+% Only 5 entries and 4 are repeated. The last one is at a later time than the first sample in /2010/winter/loggers/raw/12709.002. This happen only if the 5 minutes time offset on the par file is used
+%
+/2014/summer/loggers/raw/12603.002,0,365,0,0,0,0,0,1,end
+% Consistent with 1 year offset of /2014/summer/loggers/raw/12603.003 which was supported by the last entry of the file seamless continuous with previous but with 2014 timestamp
+%
+/2014/summer/loggers/raw/12603.003,0,365,0,0,0,0,0,1,8016
+% Consistent with 1 year jump in the last entry of the file, which is seamless and continuous with previous but with 2014 timestamp
+%
+/2014/winter/loggers/raw/12603.003,1,0,0,0,0,0,0,1,end
+% One day of data with unknown timeshift, so it was discarded
+%
+/2014/winter/loggers/raw/12603.004,1,0,0,0,0,0,0,1,end
+% Two days of data with unknown timeshift, so it was discarded
+%
+/2014/winter/loggers/raw/15945.001,1,0,0,0,0,0,0,1,42862
+% The start (lines 5 to 42,866) contain exactly the same data found at the end of /2013/winter/loggers/raw/15945.002 (lines 400,771 to 443,632).
+%
+/2012/summer/loggers/raw/15949.001,0,0,0,15.65873493333333333333,0,0,0,9301,9301
+%File contain one entry on line 9305 with a weird timestamp
+%
+/2012/winter/loggers/raw/6568.002,0,0,0,-4,0,0,0,1,3
+% Time seem to have being adjusted after the 3rd entry.
+%
+/2012/winter/loggers/raw/6568.001,0,0,0,-4,0,0,0,1,end
+% Ofset consisten with next file's fisrt entries: /2012/winter/loggers/raw/6568.002 (see previous entry in ths file)
+%
+/2012/winter/loggers/raw/6568.006,1,0,0,0,0,0,0,6679,6685
+% Continued measurement stops at 6678 and before reestarting at 6686 about 110 days later, there is entries between 6679 and 6685 with time stamps much earlier and releated at the begin of the file
+%
+/2014/summer/loggers/raw/15948.001,0,61,-3,-10,0,0,0,1,8132
+% Backwards time jump at file line 8137, looks like time was adjusted when 14P66 was installed, plus the two months
+% (61 days) consisten with change in /2015/winter/loggers/raw/15948.001
+%
+/2014/summer/loggers/raw/15948.001,0,61,0,,0,0,0,8133,end
+% Two months shift (61 days) consisten with change in /2015/winter/loggers/raw/15948.001 is here applied to the rest
+% of the file as previous entry correct it together with a time shift inside the file for the first part of the file
+%
+/2015/winter/loggers/raw/15948.001,0,61,0,15,0,0,0,1,2
+% Data VERY continous and 15 min jump after second entry. Those 2 entries adjusted to be consistent with rest of the file
+%
+/2008/summer/loggers/raw/6566.001,1,0,0,0,0,0,0,1,1
+% First entry with anomalous time jumop and out of face, removed due to unreliability of timestamp
+%
+/2012/winter/loggers/raw/15948.002,1,0,0,0,0,0,0,178911,end
+% Battery died and recover fully (battery replacement?), last 4 entries are very discontinous after only ~4 hours, probably clock stopped and restarted from were it dies
+%
+/2013/summer/loggers/raw/15949.002,1,0,0,0,0,0,0,1,end
+% File identical to /2013/summer/loggers/raw/15949.001
+%
+/2013/summer/loggers/raw/15945.001,1,0,0,0,0,0,0,1,end
+/2013/summer/loggers/raw/15945.002,1,0,0,0,0,0,0,1,end
+% Both files are totally contained inside /2014/winter/loggers/raw/15945.001
+%
+/2013/summer/loggers/raw/55428.001,1,0,0,0,0,0,0,1,end
+% File are totally contained inside /2014/winter/loggers/raw/55428.001 (at the start)
+%
+/2013/summer/loggers/raw/3894.001,1,0,0,0,0,0,0,1,end
+% File is totally contained inside /2014/winter/loggers/raw/3894.001 (at the start)
+%
+/2013/summer/loggers/raw/6563.006,0,4944,22,32.783,0,0,0,1,end
+% Logger reset and start from day 0 year 2000. Right offset recorded on fieldbook (CAR p.51) Logger time 0000,001,18:15 (in file year shows up as 2000) GPS time 2013,197,16:47:47 (JULY 16th)
+%
+/2011/summer/loggers/raw/15949.001,1,0,0,0,0,0,0,1,5
+/2011/summer/loggers/raw/15948.001,1,0,0,0,0,0,0,1,1
+% From temperature records it is obvious that the few entries at the start of the files that belong to a time months before are wrong
+%
+/2013/winter/loggers/raw/12603.005,0,0,13,9,0,0,0,1,end
+/2013/winter/loggers/raw/12603.006,0,0,23,29,0,0,0,1,end
+% An offset of -10h -20min can be computed from jump from 12603.005 to 12603.006, as both starts at the same time, but data seem continous. So this offset is needed to be applied to 12603.005 to splice both files seamlesly.
+% But from the temperature record of spliced data it is clear that both files (spliced as above) are about one day behind, so i corrected they would be continuos with next file /2013/summer/loggers/raw/12603.001 & 002 which time is OK from temperature records. For a proper splicing of temperature series an offset of 23h 29 min was computed.
+%
+/2013/summer/loggers/raw/55426.001,1,0,0,0,0,0,0,1,1
+% It have one record with completely out of place date at the file start
+%
+/2014/summer/loggers/raw/62566.001,1,0,0,0,0,0,0,1,1
+% It have one record with completely out of place date at the file start
+%
+%/2014/winter/loggers/raw/15948.001,1,0,0,0,0,0,0,1,end
+% File with 10 days of data and completely out of time as it becomes evident from temperature records. It has transducers hooked up from channels 1-5, showing only NaN and few random values in between, so the file is discarded. This data is duplicated at the start of /2014/summer/loggers/raw/15948.001 but with July dates instead of May.
+The temperature record suggest that the timestamps correspond to July 2014 but offseted about 1.5 days
+%
+/2014/summer/loggers/raw/15948.001,1,0,0,0,0,0,0,1,6564
+% See entry for /2014/winter/loggers/raw/15948.001
+%
+/2014/summer/loggers/raw/13495.001,1,0,0,0,0,0,0,1,end
+% ~9 hours file with no tranducers hooked-up and factory date (year 2000). Probably a logger connected by first time.
+%
+% All entries below correspond to automatic minimum final offset needed to avoid time overlaps with next file
+/2012/summer/loggers/raw/2381.004,0,0,0,0,0,0,-1,1,end
+/2014/summer/loggers/raw/15949.002,0,0,0,0,0,0,-2,1,end
+/2011/summer/loggers/raw/12603.002,0,0,0,0,0,0,-1,1,end
+/2011/summer/loggers/raw/12603.004,0,0,0,0,0,0,-1,1,end
+/2011/summer/loggers/raw/6566.003,0,0,0,0,0,0,-1,1,end
+/2012/summer/loggers/raw/6566.005,0,0,0,0,0,0,-1,1,end
+/2010/summer/loggers/raw/6563.007,0,0,0,0,0,0,-1,1,end
+/2013/winter/loggers/raw/14534.017,0,0,0,0,0,0,-1,1,end
+%
+

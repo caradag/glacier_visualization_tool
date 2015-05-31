@@ -15,8 +15,8 @@ function [grids dist]=pos2grid(pos,year,frac)
     dN=gridSize*cosd(rotation);
 
     % Computing position grid location
-    C1=pos(1)-E10-5.356*(year-Y0);
-    C2=pos(2)-N10+14.678*(year-Y0);
+    C1=pos(:,1)-E10-5.356*(year-Y0);
+    C2=pos(:,2)-N10+14.678*(year-Y0);
 
     row=(C2-(dN/dE)*C1)./((gridSize^2)/dE);
     col=(C1+dN*row)./dE;
@@ -24,16 +24,26 @@ function [grids dist]=pos2grid(pos,year,frac)
     row=row+10;
     col=col+10;
     
-    rrow=round(row./frac)*frac;
-    rcol=round(col./frac)*frac;
-    
-    dist=sqrt(((rrow-row).^2)+((rcol-col).^2))*gridSize;
-    
-    grids=cell(nPos,1);
-    for i=1:nPos
-        grids{i}=sprintf('R%gC%g',rrow(i),rcol(i));
+    if frac>0
+        rrow=round(row./frac)*frac;
+        rcol=round(col./frac)*frac;
+    else
+        rrow=row;
+        rcol=col;
     end
-    if nPos==1
-        grids=grids{1};
+
+    if frac==0
+        dist=0;
+        grids=[rrow(:) rcol(:)];
+    else
+        dist=sqrt(((rrow-row).^2)+((rcol-col).^2))*gridSize;
+
+        grids=cell(nPos,1);
+        for i=1:nPos
+            grids{i}=sprintf('R%gC%g',rrow(i),rcol(i));
+        end
+        if nPos==1
+            grids=grids{1};
+        end
     end
 end

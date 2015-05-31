@@ -13,8 +13,8 @@ function populatePanels(forceRePopulation)
     
     %######## COMPILING DATA STATISTICS: POSITIONS AND TIME SPANS #########
     for p=1:npanels
-        axisLims=struct('time_days',[NaN NaN],'press_kPa',[],'press_mWaterEq',[],'press_PSI',[],'volt_V',[],'temp_C',[],'speed_cmPerDay',[],'deviation_mm',[],'melt_mmPerDay',[]);
-        axisLimsClean=struct('time_days',[NaN NaN],'press_kPa',[],'press_mWaterEq',[],'press_PSI',[],'volt_V',[],'temp_C',[],'speed_cmPerDay',[],'deviation_mm',[],'melt_mmPerDay',[]);
+        axisLims=struct('time_days',[NaN NaN],'press_kPa',[],'press_mWaterEq',[],'press_PSI',[],'volt_V',[],'temp_C',[],'speed_cmPerDay',[],'deviation_mm',[],'melt_mmPerDay',[],'norm',[]);
+        axisLimsClean=struct('time_days',[NaN NaN],'press_kPa',[],'press_mWaterEq',[],'press_PSI',[],'volt_V',[],'temp_C',[],'speed_cmPerDay',[],'deviation_mm',[],'melt_mmPerDay',[],'norm',[]);
 
         axisLims.time_days=[NaN NaN];
         panelPosSum=[0 0];
@@ -269,6 +269,15 @@ function populatePanels(forceRePopulation)
 
                             axisID='temp_C';
                             color=[1 1 0.4];
+                        case 'DOP'
+                            time=panels(p).data(d).time;
+                            nSamples=length(time);
+                            breakes=[1 nSamples];
+                            yData=panels(p).data(d).yData;
+                            yData=(yData-min(yData))/(max(yData)-min(yData));
+                            [norm2y y2norm yData]=normalize(yData, time, panels(p).data(d).normMode);
+                            yDescription=panels(p).data(d).description;    
+                            axisID='norm';
                     end
                 case 'gps'
                     %stablish units transformation

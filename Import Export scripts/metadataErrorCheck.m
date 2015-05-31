@@ -285,5 +285,8 @@ function metadataErrorCheck()
             disp(['WARNING: No information for hole(s) ' sprintf('%02d,',find(noInformation)) 8 ' on year ' num2str(year+2000) ' (year''s holes count: ' num2str(maxID) ')']);
         end
     end
+    
+%     thickness(isnan(thickness))=[];
+%     hist(thickness,[30:10:100])
 end
     
