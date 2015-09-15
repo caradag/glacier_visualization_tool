@@ -38,6 +38,25 @@ function populatePanels(forceRePopulation)
                         toRemove(end+1,1:2)=[p d];
                         continue;
                     end
+                    % If the sensor don't have the requested veriable we
+                    % remove that variable
+                    % loading data if needed
+                    if ~isfield(data,ID)
+                        tmp=load([const.DataFolder const.sensorDataFile],ID);
+                        data.(ID)=tmp.(ID);
+                        clear tmp
+                    end
+                    if ~isfield(data.(ID),panels(p).data(d).variable)
+                        disp(['WARNING: No ' panels(p).data(d).variable ' for ' ID]);
+                        toRemove(end+1,1:2)=[p d];
+                        continue;
+                    end
+                    if ~any(~isnan(data.(ID).(panels(p).data(d).variable){1}))
+                        disp(['WARNING: No ' panels(p).data(d).variable ' data for ' ID ' (all NaNs)']);
+                        toRemove(end+1,1:2)=[p d];
+                        continue;
+                    end
+                    
                 case 'gps'
                     source=panels(p).data(d).source;            
                     if isempty(tLims)
@@ -58,7 +77,7 @@ function populatePanels(forceRePopulation)
         panels(p).axisLimsClean=axisLimsClean;
         panels(p).meanPos=panelPosSum/posCount;        
     end
-
+    toRemove = flipud(unique(toRemove,'rows'));
     for i=1:size(toRemove,1)
         swapPanels([],[],toRemove(i,1:2),[]);
     end
@@ -229,6 +248,73 @@ function populatePanels(forceRePopulation)
 
                             axisID='press_kPa';
                             color=[0 0 1];
+                        case {'conductivity','transmissivity','backgroundLuminosity','IR_reflectivity','RED_reflectivity',...
+                                'GREEN_reflectivity','BLUE_reflectivity','UV_reflectivity','accelerationX','accelerationY',...
+                                'accelerationZ','accelerationSTD','inclination','magneticFieldX','magneticFieldY','magneticFieldZ',...
+                                'azimuth','bedTemperature','confinement','voltage'};
+                            %getting data
+                            time=data.(ID).time.serialtime(:);
+                            yData=data.(ID).(var){1}(:);
+                            yDescription=[upper(var(1)) var(2:end) ' at sensor ' ID ' at position ' data.(ID).grid{1}];
+                            
+                            nonNanSamples=~isnan(yData);
+                            %removing NaNs
+                            yData=yData(nonNanSamples);
+                            time=time(nonNanSamples);
+                            nSamples=length(time);
+                            
+                            nonNanSamples=~isnan(yData);
+                            
+                            breakes=[1 nSamples];
+
+                            bigGaps=find(abs(diff(time))>(120/1440));
+                            for g=1:length(bigGaps)
+                                breakes=[breakes; [bigGaps(g)+1 bigGaps(g)]];
+                            end                            
+                            [nonNanIntervals] = getIntervals(nonNanSamples);
+                            inis=false(nSamples,1);
+                            inis(breakes(:,1))=true;
+                            inis=unique([find(inis & nonNanSamples); [nonNanIntervals.ini]']);
+                            ends=false(nSamples,1);
+                            ends(breakes(:,2))=true;
+                            ends=unique([find(ends & nonNanSamples); [nonNanIntervals.end]']);
+                            breakes=[inis ends];
+
+                            % finding positions [east north elev depth]
+                            pos.east=metadata.sensors.(ID).pos(1);
+                            pos.north=metadata.sensors.(ID).pos(2);
+                            pos.elev=data.(ID).position{1}.elev;
+                            pos.thickness=data.(ID).position{1}.thickness;
+                            extraDesc='';
+                            if isnan(pos.thickness)
+                                pos.thickness=getGPRdepth(pos.east,pos.north);
+                                extraDesc=['WARNING: Depth estimated from GPR data (' num2str(pos.thickness) ' m)'];
+                            end
+                            
+                            if(strcmp(var,'inclination'))
+                                %yData=abs(yData-yData(1));
+                                %panels(p).data(d).normMode={'manual',[0 45]};
+                            end
+                            %normalizing data and getting transformation functions
+                            [norm2y y2norm yData time]=normalize(yData, time, panels(p).data(d).normMode);
+                           
+                            switch var
+                                case 'conductivity'
+                                    axisID='press_kPa';
+                                    color=[0 1 0];
+                                case 'transmissivity'
+                                    axisID='press_kPa';
+                                    color=[0.30196       0.7451      0.93333];
+                                case 'inclination'
+                                    axisID='press_kPa';
+                                    color=[0.74902            0      0.74902];                                    
+                                case {'backgroundLuminosity','IR_reflectivity','RED_reflectivity',...
+                                'GREEN_reflectivity','BLUE_reflectivity','UV_reflectivity','accelerationX','accelerationY',...
+                                'accelerationZ','accelerationSTD','magneticFieldX','magneticFieldY','magneticFieldZ',...
+                                'azimuth','bedTemperature','confinement','voltage'}
+                                    axisID='press_kPa';
+                                    color=[0.74902            0      0.74902];
+                            end
                         case 'battvolt'
                             %getting data
                             time=data.(ID).time.serialtime(:);
@@ -398,11 +484,11 @@ function populatePanels(forceRePopulation)
             else
                 panels(p).data(d).cleanTimeLims=cleanTimeLims; 
             end
-            
+
             if ~isfield(panels(p).data(d),'color') || isempty(panels(p).data(d).color)
                 % if there is no color information already we assign the default value
                 panels(p).data(d).color=color;
-            end           
+            end
         end
         % Once the panel is complete we rearange the data field to send to 
         % the back the data sets in sendToBack. Specially useful to put

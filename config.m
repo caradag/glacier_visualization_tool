@@ -1,11 +1,14 @@
 % data file, if empty a dialog box will ask to select a file
-sensorDataFile='data 2014 v5.mat';
+sensorDataFile='data 2015 Aug30.mat';
 
 % default folder for open/save data
 DataFolder='/home/camilo/5_UBC/Data visualization GUI/Borehole data/';
 
 % default folder were all processing routines are
 routinesFolder='/home/camilo/5_UBC/Data visualization GUI/Rutines/';
+
+% default folder were all import data routines are located
+imporExportFolder='/home/camilo/5_UBC/Data visualization GUI/Import Export scripts/';
 
 % default folder for temporary data masks
 MasksFolder='/home/camilo/5_UBC/Data visualization GUI/Masks/';
@@ -25,7 +28,7 @@ rawDataFolder='/home/camilo/5_UBC/Field/FIELD_DATA/DATA';
 
 % defining accesory data files
 temperatureTimeserieFile='T_GL1.txt';
-sensorReferenceTableFile='Pressure_Sensor_Reference_Table_2014.csv';
+sensorReferenceTableFile='Pressure_Sensor_Reference_Table_2015.csv';
 rawFilesMetadata='data_logges_raw_files_metadata.csv';
 glacholeFile='glachole.mod';
 gpsFile='GPSdata_v4.mat';

@@ -1,3 +1,18 @@
+% Raw files metadata info
+% Comma separated file with the following fields
+% Path: Path and file name to the file
+% Ignore Flag: 1=> Ignore data of the specified interval. Default: 0
+% Start offset days     |
+% Start offset Hours    | Offset to apply to the first sample of the specified data interval, timestamps are computed by adding the offset
+% Start offset Minutes  |
+
+% Start offset days     |
+% Start offset Hours    | Offset to apply to the last sample of the specified data interval, timestamps copmputed by linear interpolation between start and end offsets
+% Start offset Minutes  |
+
+% Data range start: First line in raw data to be offseted/ignored
+% Data range end: Last line in raw data to be offseted/ignored, the 'end' flag is accepted meaning the last line of the file
+
 % Set ignore flag to 1 if the file should not be used at all
 % Set offset times adding sign to all entries (i.e. -1 day -3 hour -2 minutes)
 % If there is entries to be ignored, set the first and last valid entries to something different than 1:end
@@ -144,4 +159,15 @@ The temperature record suggest that the timestamps correspond to July 2014 but o
 /2010/summer/loggers/raw/6563.007,0,0,0,0,0,0,-1,1,end
 /2013/winter/loggers/raw/14534.017,0,0,0,0,0,0,-1,1,end
 %
-
+% Field 2015 data entries
+/2015/winter/loggers/raw/55427.002,1,0,0,0,0,0,0,298304,end
+% after line 298303 there is a ~1 hour backwards time jump, and only a couple hours of data afterwars that were discarded
+%
+/2015/winter/loggers/raw/12603.003,1,0,0,0,0,0,0,1,end
+% File contains only one line with a wrong timestamps (year 2020)
+%
+/2015/summer/loggers/raw/12603.001,0,178,0,0,0,0,0,1,end
+%File had wrong timestamps, time OK but day with 178 days offset (July 17 was day 20)
+%
+/2015/summer/loggers/raw/12603.006,0,178,0,0,0,0,0,1,458
+%File had wrong timestamps, time OK but day with 178 days offset (July 17 was day 20). Correction was done after line 458

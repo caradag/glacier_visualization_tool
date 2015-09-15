@@ -6,8 +6,7 @@ function BoreholeBrowser()
     path(path,const.routinesFolder);
     %path(path,'/home/camilo/5_UBC/GPS_processing/02_Solution data manipulation (Lucas, SCOUT, PPP, Relative)/Relative/');
     % browser window size
-    W=1020;
-    H=668;
+    defaultBrowserWindowPos=[2 28 1917 970];
 
     % initialize global variables
     displayStatus=struct('timeSel',[]);
@@ -49,7 +48,7 @@ function BoreholeBrowser()
 
     % ############# creating main browser interface ###################
     disp('Creating main data browser figure');
-    fHandles.browsefig=figure('Name','Field Data Browser','NumberTitle','off','Position',[2 60 W H],'ResizeFcn',@drawFigure,'KeyPressFcn',@figureKeyPress,'MenuBar','none');
+    fHandles.browsefig=figure('Name','Field Data Browser','NumberTitle','off','Position',defaultBrowserWindowPos,'ResizeFcn',@drawFigure,'KeyPressFcn',@figureKeyPress,'MenuBar','none');
     drawFigure();
     %set(fHandles.browsefig,'Name','Field Data Browser','NumberTitle','off','Position',[2 60 W H],'ResizeFcn',@drawFigure,'KeyPressFcn',@figureKeyPress,'MenuBar','none');
 end
@@ -138,6 +137,8 @@ function drawFigure(source,eventdata)
     graphMenu = uimenu('Label','Current graph');
     uimenu(graphMenu,'Label','Show/Hide deleted samples [d]','Callback',{@figureKeyPress,[],[],'d'});
     uimenu(graphMenu,'Label','Display map','Callback',{@displayMap,'create'});
+    uimenu(graphMenu,'Label','Sort by Row','Callback',{@sortPlot,'R'});
+    uimenu(graphMenu,'Label','Sort by Column','Callback',{@sortPlot,'C'});
 %    uimenu(graphMenu,'Label','Distance between sensors...','Callback','ruler');
     uimenu(graphMenu,'Label','Save current graph...','Callback',{@saveRestoreCurrentView,'save'});
     uimenu(graphMenu,'Label','Load saved graph...','Callback',{@saveRestoreCurrentView,'load'});

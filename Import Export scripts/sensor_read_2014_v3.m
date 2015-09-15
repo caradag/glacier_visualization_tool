@@ -200,7 +200,7 @@ for ii=1:n_sensor
         hookUpTimeStamp=datenum([date_start.year(jj) 1 1 fix(date_start.time(jj)/100) mod(date_start.time(jj),100) 0])-1+date_start.day(jj);
         firstNonNanPress=find(~isnan(rawpress{jj}),1,'first');
         firstNonNanTime=datenum([year{jj}(firstNonNanPress) 1 1 hours{jj}(firstNonNanPress) minutes{jj}(firstNonNanPress) 0])-1+day{jj}(firstNonNanPress);
-        if isnan(rawpress{jj}(1)) || (firstNonNanTime-(hookUpTimeStamp+samplingStep{jj}(1)))>filespec.timeTolerance
+        if ~isempty(rawpress{jj}) && (isnan(rawpress{jj}(1)) || (firstNonNanTime-(hookUpTimeStamp+samplingStep{jj}(1)))>filespec.timeTolerance)
             warning('SENSOR_READ:Missing_data_after_hookup',['First non-NaN data happen after hook-up for ' sensor_list{ii} ' (hook up at ' num2str(date_start.year(jj)) ',' num2str(date_start.day(jj)) ',' num2str(date_start.time(jj)) ' and first non-NaN at ' num2str(year{jj}(firstNonNanPress)) ',' num2str(day{jj}(firstNonNanPress)) ',' num2str(hours{jj}(firstNonNanPress)*1e2+minutes{jj}(firstNonNanPress)) ')'])
             disp(['File:' filespec.path filenames{jj}{1}]);
         end
@@ -238,7 +238,7 @@ for ii=1:n_sensor
         if ~raw
         %Convert Raw Data into pressure above atmospheric gauge pressure in Pa
             switch log_type{jj}
-                case 'CR1000'
+                case {'CR1000','CR1000MUX'}
                     output.pressure{ii} = [output.pressure{ii}; (rawpress{jj}-atpress_CR1K)*multiplier];
                 otherwise
                     output.pressure{ii} = [output.pressure{ii}; (rawpress{jj}-atpress)*multiplier];                    
@@ -412,14 +412,25 @@ for year_nominal=start_year:finish_year+1
                     % outputs are the same 
                     lastLine='a';
                     lastLine2='b';
-                    while ~strcmp(lastLine,lastLine2)
+                    attempts=0;
+                    while ~strcmp(lastLine,lastLine2) || isempty(lastLine)
                        [~, lastLine]=system(['tail -n 1 "' filespec.path filename_read '"']);
                        [~, lastLine2]=system(['tail -n 1 "' filespec.path filename_read '"']);
+                       if(attempts>30)
+                           disp('Warning: More than 30 attempts to retrive last line using:');
+                           disp(['tail -n 1 "' filespec.path filename_read '"']);
+                           break
+                       end
+                       attempts=attempts+1;
                     end
                     if isempty(lastLine)
                        error(['Error retreiving last line of ' filename_read ]) 
                     end
                     lastFieldCount=sum(lastLine==',')+1;
+                    %Both CR10(X) and CR1000 loggers have 12 data fields,
+                    %extraColumns account for extra fields
+                    %due to bugs in the probram of some old CR10 or due to
+                    %multiplexers
                     if lastFieldCount>12
                         extraColumns=lastFieldCount-12;
                     end
@@ -429,8 +440,8 @@ for year_nominal=start_year:finish_year+1
                             fileEndTime=textscan(lastLine, ['%*u %f %f %f %f %f %f %f %f %f %f %f' repmat(' %*f',1,extraColumns) ], 'delimiter', ',','emptyvalue',NaN);
                             fileEndTime=datenum([fileEndTime{1} 1 1])+(fileEndTime{2}-1)+fix(fileEndTime{3}/100)/24+rem(fileEndTime{3},100)/1440;
                             headerLines=0;
-                        case 'CR1000'                            
-                            fileEndTime=textscan(lastLine,'"%4f-%2f-%2f %2f:%2f:%f" %*u %*f %*f %*f %*f %*f %*f %*f %*f %*f %*f','delimiter',',','emptyvalue',NaN,'TreatAsEmpty','"NAN"');
+                        case {'CR1000','CR1000MUX'}                        
+                            fileEndTime=textscan(lastLine,['"%4f-%2f-%2f %2f:%2f:%f" %*u %*f %*f %*f %*f %*f %*f %*f %*f %*f %*f' repmat(' %*f',1,extraColumns) ],'delimiter',',','emptyvalue',NaN,'TreatAsEmpty','"NAN"');
                             fileEndTime=datenum([fileEndTime{:}]);
                             headerLines=4;
                     end
@@ -457,7 +468,8 @@ for year_nominal=start_year:finish_year+1
                     % outputs are the same 
                     firstLine='a';
                     firstLine2='b';
-                    while ~strcmp(firstLine,firstLine2)
+                    attempts=0;
+                    while ~strcmp(firstLine,firstLine2) || isempty(firstLine)
                         if headerLines==0
                             % Using linux command head to quickly get fisrt line
                            [~, firstLine]=system(['head -n 1 "' filespec.path filename_read '"']);
@@ -466,15 +478,20 @@ for year_nominal=start_year:finish_year+1
                             % Using linux command head combined with tail to quickly get the 5th line (fisrt 4 are header lines)
                             [~, firstLine]=system(['head -n ' num2str(headerLines+1) ' "' filespec.path filename_read '" | tail -n 1']);
                             [~, firstLine2]=system(['head -n ' num2str(headerLines+1) ' "' filespec.path filename_read '" | tail -n 1']);
-                        end                            
+                        end  
+                        if(attempts>30)
+                           disp('Warning: More than 30 attempts to retrive first line');
+                           break
+                        end
+                       attempts=attempts+1;
                     end
                     firstFieldCount=sum(firstLine==',')+1;
                     switch log_type
                         case {'CR10','CR10X'}
                             fileStartTime=textscan(firstLine,['%*u %f %f %f %f %f %f %f %f %f %f %f' repmat(' %*f',1,extraColumns) ], 'delimiter', ',','emptyvalue',NaN);
                             fileStartTime=datenum([fileStartTime{1} 1 1])+(fileStartTime{2}-1)+fix(fileStartTime{3}/100)/24+rem(fileStartTime{3},100)/1440;
-                        case 'CR1000'
-                            fileStartTime=textscan(firstLine,'"%4f-%2f-%2f %2f:%2f:%f" %*u %*f %*f %*f %*f %*f %*f %*f %*f %*f %*f','delimiter',',','emptyvalue',NaN,'TreatAsEmpty','"NAN"');
+                        case {'CR1000','CR1000MUX'}
+                            fileStartTime=textscan(firstLine,['"%4f-%2f-%2f %2f:%2f:%f" %*u %*f %*f %*f %*f %*f %*f %*f %*f %*f %*f' repmat(' %*f',1,extraColumns) ],'delimiter',',','emptyvalue',NaN,'TreatAsEmpty','"NAN"');
                             fileStartTime=datenum([fileStartTime{:}]);
                     end
                     fileStartTime=fileStartTime+startOffset_days;
@@ -526,10 +543,10 @@ for year_nominal=start_year:finish_year+1
                         if CR10
                             year(year<2000)=mod(year(year<2000),2000)+2000; %fix Y2K problem on old loggers
                         end
-                    elseif strcmp(log_type,'CR1000')
+                    elseif strcmp(log_type,'CR1000') || strcmp(log_type,'CR1000MUX')
                         monthlength = cumsum([0 31 28 31 30 31 30 31 31 30 31 30])';
                         monthlength_leap = cumsum([0 31 29 31 30 31 30 31 31 30 31 30])';
-                        data_in=textscan(fid,'"%4f-%2f-%2f %2f:%2f:%f" %*u %f %f %f %f %f %f %f %f %f %f','delimiter',',','emptyvalue',NaN,'TreatAsEmpty','"NAN"','headerlines',4);                            
+                        data_in=textscan(fid,['"%4f-%2f-%2f %2f:%2f:%f" %*u %f %f %f %f %f %f %f %f %f %f' repmat(' %f',1,extraColumns) ],'delimiter',',','emptyvalue',NaN,'TreatAsEmpty','"NAN"','headerlines',4);                            
                         n_data_in=length(data_in{1});
                         % Double check n_in_data length is consistent with the number of lines in the data file
                         if rawLineCount>n_data_in+4
@@ -581,7 +598,7 @@ for year_nominal=start_year:finish_year+1
                         press=[press1,press2,press3,press4,press5,press6];
                         press=press(:,chan_read);
                         press(press==-99999) = NaN; %rewrite Campbell NaNs                        
-                    elseif strcmp(log_type,'CR1000')
+                    elseif strcmp(log_type,'CR1000') || strcmp(log_type,'CR1000MUX')
                         monthlength = cumsum([0 31 28 31 30 31 30 31 31 30 31 30]);
                         monthlength_leap = cumsum([0 31 29 31 30 31 30 31 31 30 31 30]);
                         [timestamp_str,~,battvolt_str,temp_str,press1,press2,press3,press4,press5,press6,press7,press8]=...

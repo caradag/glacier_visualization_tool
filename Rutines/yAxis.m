@@ -92,33 +92,41 @@ elseif plotsOnScreen<3
 elseif plotsOnScreen<4
     maxTicks=6;
 elseif plotsOnScreen<6
-    maxTicks=4;
+    maxTicks=5;
 elseif plotsOnScreen<8
-    maxTicks=3;
+    maxTicks=4;
 elseif plotsOnScreen<10
-    maxTicks=2;
-elseif plotsOnScreen<15
+    maxTicks=3;
+elseif plotsOnScreen<16
     maxTicks=2;
 else
     maxTicks=0;
 end
 ticks=[];
 
-tickStep=spanData/maxTicks;%the tick step that fits to the number of requiered ticks marks
-multi=10^floor(log10(tickStep));%multiplier (power of 10 corespoinding to the first digit of the tick step value)
-scaledTickStep=tickStep/multi;
-validSteps=[1 2 5];%acceptable steps
-[~, stepID]=min(abs(validSteps-scaledTickStep));
-step=validSteps(stepID)*multi;%best acceptable tick step
+if maxTicks>0
+    tickStep=spanData/maxTicks;%the tick step that fits to the number of requiered ticks marks
+    multi=10^floor(log10(tickStep));%multiplier (power of 10 corespoinding to the first digit of the tick step value)
+    scaledTickStep=tickStep/multi;
+    validSteps=[1 2 5];%acceptable steps
+    [~, stepID]=min(abs(validSteps-scaledTickStep));
+    step=validSteps(stepID)*multi;%best acceptable tick step
 
-firstStep=ceil(minData/step)*step;%first tick step
+    firstStep=ceil(minData/step)*step;%first tick step
 
-%unscaled tick marks
-ticks=firstStep:step:maxData;
+    %unscaled tick marks
+    ticks=firstStep:step:maxData;
 
-labels=mat2cell(ticks,1,ones(1,length(ticks)));
-labels = cellfun(@num2str,labels,'UniformOutput',false);%labels as a cell array of strings
-scaledTicks=(((ticks-minData)/spanData)*dataSpace)+dataShift+globalPos-1;
+    labels=mat2cell(ticks,1,ones(1,length(ticks)));
+    labels = cellfun(@num2str,labels,'UniformOutput',false);%labels as a cell array of strings
+    scaledTicks=(((ticks-minData)/spanData)*dataSpace)+dataShift+globalPos-1;
+else  
+    labels = {['|' sprintf('%.2f',spanData)]};
+    scaledTicks= 0.5+globalPos-1;
+end    
+if any(isnan(scaledTicks))
+    error('NaN ticks!!! check yAxis.m routine')
+end
 end
 
 function [ticks labels] = getIdAxis(p)

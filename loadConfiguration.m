@@ -9,4 +9,6 @@ function conf=loadConfiguration()
         end
         conf.(vars{i})=eval(vars{i});
     end
+    path(path,conf.routinesFolder);
+    path(path,conf.imporExportFolder);
 end

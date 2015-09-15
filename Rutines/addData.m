@@ -37,6 +37,13 @@ function addData(source,eventdata,currentPanel)
     % Meteo data
     meteos={'Temperature','Melt'};
     
+    % Variables
+    variables={'pressure','conductivity','transmissivity','backgroundLuminosity','IR_reflectivity','RED_reflectivity','GREEN_reflectivity',...
+        'BLUE_reflectivity','UV_reflectivity','accelerationX','accelerationY','accelerationZ','accelerationSTD','inclination',...
+        'magneticFieldX','magneticFieldY','magneticFieldZ','azimuth','bedTemperature','confinement','voltage','temperature','battvolt'};
+    variablesTxt={'Pressure','Conductivity','Transmissivity','Background lum.','IR Reflectivity','Red Reflectivity','Green Reflectivity',...
+        'Blue Reflectivity','UV Reflectivity','Acceleration X','Acceleration Y','Acceleration Z','Acceleration STD','inclination',...
+        'Magnetic field X','Magnetic field Y','Magnetic field Z','Azimuth','Bed temperature','Confinement','Sensor voltage','Surface temperature','Logger voltage'};
     % ############## CREATING GUI #######################
     % SETING DEFAULTS
     gpsSources={'Relative'};
@@ -45,7 +52,7 @@ function addData(source,eventdata,currentPanel)
     
     enableValues={'off','on'};
     W=700;
-    H=530;
+    H=730;
     dlg = figure('Name','Select data serie to add to the workspace','Position',[200 154 W H],'MenuBar','none','NumberTitle','off');
     colWith=150;
     baseX=10;
@@ -130,14 +137,12 @@ function addData(source,eventdata,currentPanel)
     uicontrol(dlg,'Style', 'checkbox','String',' Vertical deviation','Position', [2 iY colWith-4 20],'parent',radioGPSMode,'Min',0,'Max',1,'Callback',{@setGpsVariable,'verticalDeviation'});iY=iY-22;
     set(radioGPSMode,'Visible','on');
 
-    h=4*23; Y=Y-h-5; 
-    radioTransducerVars=uibuttongroup('Units','pixels','Position', [baseX Y colWith h]);iY=h-25;
-    uicontrol(dlg,'Style', 'text','String','Transducer variables','Position', [2 iY colWith-4 20],'parent',radioTransducerVars,'FontSize',12);iY=iY-20;
-    uicontrol(dlg,'Style', 'checkbox','String',' Pressure','Position', [2 iY colWith-4 20],'parent',radioTransducerVars,'Min',0,'Max',1,'Value',1,'Callback',{@setTransducerVariable,'pressure'});iY=iY-22;
-    uicontrol(dlg,'Style', 'checkbox','String',' Logger temperature','Position', [2 iY colWith-4 20],'parent',radioTransducerVars,'Min',0,'Max',1,'Callback',{@setTransducerVariable,'temperature'});iY=iY-22;
-    uicontrol(dlg,'Style', 'checkbox','String',' Battery voltage','Position', [2 iY colWith-4 20],'parent',radioTransducerVars,'Min',0,'Max',1,'Callback',{@setTransducerVariable,'battvolt'});iY=iY-22;
-    set(radioTransducerVars,'Visible','on');
+    h=20; Y=Y-h-5; 
+    uicontrol(dlg,'Style', 'text','String','Variable','Position', [baseX Y colWith h],'FontSize',14);
     
+    h=Y-40-5; Y=Y-h-5; 
+    variablesList=uicontrol(dlg,'Style', 'listbox','String',variablesTxt,'Position', [baseX Y colWith h],'HorizontalAlignment','left','Max',length(variablesTxt),'Value',[1]);
+        
     h=25; Y=Y-h-5; 
     uicontrol('Style', 'pushbutton','String','Map','Position', [baseX Y (colWith/2-5) h],'Callback',@switchToMap);
     uicontrol('Style', 'pushbutton','String','Apply','Position', [baseX+colWith/2 Y colWith/2 h],'Callback',@generatePanels);
@@ -151,6 +156,8 @@ function addData(source,eventdata,currentPanel)
     function generatePanels(source,eventdata)
         % Function that reads the status of the GUI and modify the panels
         % structure to add selected data series
+        transducerVariables={variables{get(variablesList,'Value')}};
+        
         dataGroups=struct('data',{});
         %GRIDS
         list=get(gridsList,'String');

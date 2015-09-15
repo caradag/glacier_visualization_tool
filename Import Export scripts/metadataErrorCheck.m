@@ -43,7 +43,7 @@ function metadataErrorCheck()
     end
     nHoles=length(holesList);
     disp([num2str(nHoles) ' holes in dataset'])
-
+    %Checking all transducers have installation date
     % Checking all uninstallation times are greater than installation times
     inconsistentTimes=uninstallDateTime<=installDateTime;
     if any(inconsistentTimes)
@@ -54,6 +54,11 @@ function metadataErrorCheck()
     cr1000s=strcmp(logger_type,'CR1000');
     if max(channel(cr1000s))>8
         disp(['ERROR: Invalid channel (greater than 8) in metadata lines ' sprintf('%d,',find(channel>8 & cr1000s)+1)]);
+    end
+    %CR1000 + MUX
+    cr1000MUXs=strcmp(logger_type,'CR1000MUX');
+    if max(channel(cr1000s))>24
+        disp(['ERROR: Invalid channel (greater than 24) in metadata lines ' sprintf('%d,',find(channel>8 & cr1000MUXs)+1)]);
     end
     %CR10 and CR10X
     cr10s=strcmp(logger_type,'CR10') | strcmp(logger_type,'CR10X');
@@ -84,7 +89,7 @@ function metadataErrorCheck()
         end
     end
     for i=1:nSensors
-        if length(sensorList{i})~=5 || sensorList{i}(3)~='P'
+        if length(sensorList{i})~=5 || ~any(strcmp(sensorList{i}(3),{'P','D','C','L'}))
             disp(['ERROR: Anomalous sensor name for ' sensorList{i}])
         end
         % Finding entries for current sensor
@@ -246,15 +251,26 @@ function metadataErrorCheck()
     % Checking sensor was installed in a hole made before the sensor year
     tmp=sensor_ID;
     tmp(strcmp(tmp,''))={'00P00'};
-    sensorYear=cat(1,tmp{:});
-    sensorYear=sensorYear(:,1:2);
-    sensorYear(sensorYear=='X')='0';
-    sensorYear=2000+str2num(sensorYear);
+    sensorYear=zeros(length(tmp),1);
+    for t=1:length(tmp)
+        twoDigitYear=str2num(tmp{t}(1:2));
+        if(~isempty(twoDigitYear))
+            sensorYear(t)=2000+twoDigitYear;
+        else
+            sensorYear(t)=0;
+        end
+    end
     tmp=hole_ID;
     tmp(strcmp(tmp,''))={'00H00'};
-    holeYear=cat(1,tmp{:});
-    holeYear=holeYear(:,1:2);
-    holeYear=2000+str2num(holeYear);
+    holeYear=zeros(length(tmp),1);
+    for t=1:length(tmp)
+        twoDigitYear=str2num(tmp{t}(1:2));
+        if(~isempty(twoDigitYear))
+            holeYear(t)=2000+twoDigitYear;
+        else
+            holeYear(t)=0;
+        end
+    end
 
     earlierHole=find(sensorYear>holeYear);
     for i=1:length(earlierHole)
@@ -265,7 +281,7 @@ function metadataErrorCheck()
     for year=6:14
         maxID=0;
         for i=1:nHoles
-            if length(holesList{i})~=5 || holesList{i}(3)~='H'
+            if length(holesList{i})<5 || length(holesList{i})>6 || holesList{i}(3)~='H'
                 disp(['ERROR: Anomalous hole name for ' holesList{i}])
             end
 

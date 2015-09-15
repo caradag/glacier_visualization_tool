@@ -34,6 +34,7 @@ cla;
 hold on
 
 if isempty(panels)
+    return
     addData();
 end
 
@@ -112,6 +113,8 @@ for i=1:npanels
     uimenu(pcmenu(i), 'Label', ['Data source IDs: ' strjoin({panels(i).data.ID},', ')]);
     uimenu(pcmenu(i), 'Label', 'Move to top', 'Callback', {@swapPanels,i,npanels});
     uimenu(pcmenu(i), 'Label', 'Move to bottom', 'Callback', {@swapPanels,i,1});
+    uimenu(pcmenu(i), 'Label', 'Move one up', 'Callback', {@swapPanels,i,min(i+1,npanels)});
+    uimenu(pcmenu(i), 'Label', 'Move one down', 'Callback', {@swapPanels,i,max(i-1,1)});
     uimenu(pcmenu(i), 'Label', 'Remove', 'Callback', {@swapPanels,i,[]});
     uimenu(pcmenu(i), 'Label', 'Add data', 'Callback', {@addData,i});
 

@@ -1,4 +1,5 @@
 function reImportData(source,eventdata)
+%path(path,'Rutines');
 global data const
 
 if ~isempty(data)
@@ -45,27 +46,42 @@ for i=1:sensorCount
         %importing data for current sensor##############################
         % IF SENSOR READ FUNCTION HAS BEEIN UPDATED, USE THE NEWER VERSION HERE
         disp(['########################### ' sensor_ID{i} ' (' num2str(i) ' of ' num2str(sensorCount) ') #################################']);
-        sdata=rmfield(sensor_read_2014_v3('sensor',sensor_ID(i)), 'sensor');
+        switch sensor_ID{i}(3)
+            case 'P'
+                %continue;
+                sdata=rmfield(sensor_read_2014_v3('sensor',sensor_ID(i)), 'sensor');
+                
+                %computing serial timestamps
+                timelen=length(sdata.time.year{:});
+                serialyear=datenum([double(sdata.time.year{:}) repmat([1 1 0 0 0],timelen,1)])-1;
+                serialday=double(sdata.time.day{:});
+                serialhours=double(sdata.time.hours{:})/24;
+                serialminutes=double(sdata.time.minutes{:})/(24*60);
+                serialseconds=double(sdata.time.seconds{:})/(24*60*60);
+                if ~isempty(serialyear)
+                    sdata.time.serialtime=serialyear+serialday+serialhours+serialminutes+serialseconds;        
+                else
+                    sdata.time.serialtime=[];
+                end
+                
+                % removing unnecesary or deprecated fields
+                if isfield(sdata, 'effpress')
+                    sdata=rmfield(sdata, 'effpress');
+                end   
+                sdata.time = rmfield(sdata.time, 'year');
+                sdata.time = rmfield(sdata.time, 'day');
+                sdata.time = rmfield(sdata.time, 'hours');
+                sdata.time = rmfield(sdata.time, 'minutes');
+                sdata.time = rmfield(sdata.time, 'seconds');  
+
+            case {'D','C','L'}
+                sdata=sensor_read_digital(sensor_ID{i});
+            otherwise
+                warning(['Unrecognized type of sensor ' sensor_ID{i}]);
+                continue;
+        end
         
-        %computing serial timestamps
-        timelen=length(sdata.time.year{:});
-        serialyear=datenum([double(sdata.time.year{:}) repmat([1 1 0 0 0],timelen,1)])-1;
-        serialday=double(sdata.time.day{:});
-        serialhours=double(sdata.time.hours{:})/24;
-        serialminutes=double(sdata.time.minutes{:})/(24*60);
-        serialseconds=double(sdata.time.seconds{:})/(24*60*60);
 
-        sdata.time.serialtime=serialyear+serialday+serialhours+serialminutes+serialseconds;        
-
-        % removing unnecesary or deprecated fields
-        if isfield(sdata, 'effpress')
-            sdata=rmfield(sdata, 'effpress');
-        end   
-        sdata.time = rmfield(sdata.time, 'year');
-        sdata.time = rmfield(sdata.time, 'day');
-        sdata.time = rmfield(sdata.time, 'hours');
-        sdata.time = rmfield(sdata.time, 'minutes');
-        sdata.time = rmfield(sdata.time, 'seconds');
 
         fprintf(fid,'####### Sensor %s ########\n',sensor_ID{i});
         fprintf(fid,'%d samples from %s to %s\n',length(sdata.time.serialtime), datestr(min(sdata.time.serialtime)),datestr(max(sdata.time.serialtime)));
@@ -101,19 +117,20 @@ for i=1:sensorCount
             end  
         end
 
-        % Saving a copy of the original data
-        originalData.time.serialtime=sdata.time.serialtime;
-        originalData.pressure={single(sdata.pressure{1})};
-        originalData.temperature={single(sdata.temperature{1})};
-        %originalData.battvolt={single(sdata.battvolt{1})};
-        
         % Changing data types to optimize memory and getiting rid of NaN
         % timestamps
         sdata.time.serialtime=sdata.time.serialtime(validData);
         sdata.pressure={single(sdata.pressure{1}(validData))};
         sdata.temperature={single(sdata.temperature{1}(validData))};
         sdata.battvolt={single(sdata.battvolt{1}(validData))};        
-        sdata.sourceLine={uint32(sdata.sourceLine{1}(validData))};        
+        sdata.sourceLine={uint32(sdata.sourceLine{1}(validData))};      
+
+        % Saving a copy of the original data
+        originalData.time.serialtime=sdata.time.serialtime;
+        originalData.pressure={single(sdata.pressure{1})};
+        originalData.temperature={single(sdata.temperature{1})};
+        %originalData.battvolt={single(sdata.battvolt{1})};
+        
 
         uRec=length(sdata.time.serialtime);
         sortIdx=1:uRec;
@@ -274,7 +291,10 @@ for i=1:sensorCount
                 end
             end
             % END TIME
-            if abs(uEnd-oEnd) > (1/86400) && uEnd < oEnd
+            if isempty(uEnd) || isempty(oEnd)
+                disp(['    Empty start time for ' sensorcode]);
+                fprintf(fid,['!!Empty start time for ' sensorcode '\n']);
+            elseif abs(uEnd-oEnd) > (1/86400) && uEnd < oEnd
                 disp(['    !!Earlier end time for ' sensorcode ': ' datestr(uEnd) ' v/s ' datestr(oEnd)]);
                 fprintf(fid,['!!Earlier end time for ' sensorcode ': ' datestr(uEnd) ' v/s ' datestr(oEnd) '\n']);
             end
@@ -285,7 +305,7 @@ for i=1:sensorCount
             elseif (uRec > oRec) && (uEnd==oEnd) && (uStart==oStart)
                 disp(['    !!Updated data has more records but the same time span ' sensorcode ': ' num2str(uRec) ' v/s ' num2str(oRec)]);
                 fprintf(fid,['!!Updated data has more records but the same time span ' sensorcode ': ' num2str(uRec) ' v/s ' num2str(oRec) '\n']);
-                [newElements newIndexes]=setdiff(sdata.time.serialtime,data.(sensorcode).time.serialtime);
+                [newElements, newIndexes]=setdiff(sdata.time.serialtime,data.(sensorcode).time.serialtime);
                 for element=1:length(newElements)
                     if isnan(newElements(element))
                         disp([num2str(newIndexes(element)) ' -> NaN']);
@@ -369,28 +389,40 @@ for i=1:sensorCount
                 end
             end
         end
-        data = setfield(data, sensorcode, sdata);
-        % Storing metadata
-        east=sdata.position{1}.east;
-        north=sdata.position{1}.north;
-        if isnan(north) || isnan(east)
-            east=sdata.position{1}.nominal_east;
-            north=sdata.position{1}.nominal_north;
+        if ~isempty(sdata.time.serialtime)
+            %Storing data 
+            data = setfield(data, sensorcode, sdata);
+            % Storing metadata
+            east=sdata.position{1}.east;
+            north=sdata.position{1}.north;
+            if isnan(north) || isnan(east)
+                east=sdata.position{1}.nominal_east;
+                north=sdata.position{1}.nominal_north;
+            end
+            if isnan(north) || isnan(east)
+                disp(['WARNING: No coordinates in metadata for ' sensorcode '. Nominal coordinates derived from grid position were used.']);
+
+                holeYear=str2double(sdata.metadata.hole{1}{1}(1:2))+2000;
+                [east, north]=grid2pos(sdata.grid{1},holeYear);
+            end
+            metadata.(sensorcode).tLims=[min(sdata.time.serialtime) max(sdata.time.serialtime)];
+            metadata.(sensorcode).pLims=[min(sdata.pressure{1}) max(sdata.pressure{1})];
+            metadata.(sensorcode).nonNaNtLims=[min(sdata.time.serialtime(~isnan(sdata.pressure{1}))) max(sdata.time.serialtime(~isnan(sdata.pressure{1})))];
+            metadata.(sensorcode).pos=[east north];        
+            metadata.(sensorcode).grid=sdata.grid{1};      
+            metadata.(sensorcode).hole=sdata.metadata.hole{1}{1};
+        else
+            warning(['No data for sensor ' sensorcode(2:end) ', it was not stored on data structure.']);
         end
-        metadata.(sensorcode).tLims=[min(sdata.time.serialtime) max(sdata.time.serialtime)];
-        metadata.(sensorcode).pLims=[min(sdata.pressure{1}) max(sdata.pressure{1})];
-        metadata.(sensorcode).nonNaNtLims=[min(sdata.time.serialtime(~isnan(sdata.pressure{1}))) max(sdata.time.serialtime(~isnan(sdata.pressure{1})))];
-        metadata.(sensorcode).pos=[east north];        
-        metadata.(sensorcode).grid=sdata.grid{1};      
-        metadata.(sensorcode).hole=sdata.hole{1}{1};
 end
 
-[newDataFile newDataPath]=uiputfile('*.mat','Choose a name for the new data file','../Borehole data/');            
+[newDataFile, newDataPath]=uiputfile('*.mat','Choose a name for the new data file','../Borehole data/');            
 if newDataFile
     disp('Saving data...');
     [~, fileName, ext] = fileparts(newDataFile);
     save([newDataPath newDataFile],'-struct','data');
     save([newDataPath fileName '_metadata' ext],'-struct','metadata');
+    disp('DONE');
 end
 end
 function doy=DOY(datetime)

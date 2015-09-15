@@ -105,6 +105,7 @@ function loadData()
             northSum=northSum+north;
             posList(end+1,1:2)=[east north];
         end
+        posList=unique(posList,'rows');
         metadata.grids.(list{j}).tLims=tLim;
         metadata.grids.(list{j}).pos=[eastSum northSum]/nSensors;
         idx=[];
